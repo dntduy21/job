@@ -1,4 +1,4 @@
-package com.dinhngoctranduy.model;
+package com.dinhngoctranduy.model.response;
 
 import lombok.Getter;
 import lombok.Setter;

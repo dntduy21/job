@@ -1,6 +1,6 @@
 package com.dinhngoctranduy.util;
 
-import com.dinhngoctranduy.model.RestResponse;
+import com.dinhngoctranduy.model.response.RestResponse;
 import com.dinhngoctranduy.util.annotation.Message;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;

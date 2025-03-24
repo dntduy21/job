@@ -1,5 +1,6 @@
-package com.dinhngoctranduy.model.dto;
+package com.dinhngoctranduy.model.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResLoginDTO {
+    @JsonProperty("access_token")
     private String accessToken;
     private UserLogin userLogin;
 
@@ -19,5 +21,13 @@ public class ResLoginDTO {
         private long id;
         private String name;
         private String email;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserGetAccount {
+        private UserLogin user;
     }
 }

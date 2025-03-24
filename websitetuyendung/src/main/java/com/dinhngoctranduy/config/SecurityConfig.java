@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .csrf(c -> c.disable())
                 .authorizeHttpRequests(
                         authz -> authz
-                                .requestMatchers("/", "api/v1/auth/login", "/api/v1/auth/register").permitAll()
+                                .requestMatchers("/", "api/v1/auth/login", "api/v1/auth/refresh", "api/v1/auth/register").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
@@ -55,7 +55,7 @@ public class SecurityConfig {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("user");
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("permission");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);

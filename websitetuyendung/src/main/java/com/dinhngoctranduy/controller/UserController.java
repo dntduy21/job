@@ -1,26 +1,21 @@
 package com.dinhngoctranduy.controller;
 
 import com.dinhngoctranduy.model.User;
-import com.dinhngoctranduy.model.dto.ResCreateUserDTO;
-import com.dinhngoctranduy.model.dto.ResUpdateUserDTO;
-import com.dinhngoctranduy.model.dto.ResUserDTO;
-import com.dinhngoctranduy.model.dto.ResultPaginationDTO;
+import com.dinhngoctranduy.model.response.ResCreateUserDTO;
+import com.dinhngoctranduy.model.response.ResUpdateUserDTO;
+import com.dinhngoctranduy.model.response.ResUserDTO;
+import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.service.UserService;
 import com.dinhngoctranduy.util.annotation.Message;
 import com.dinhngoctranduy.util.error.IdInvalidException;
 import com.turkraft.springfilter.boot.Filter;
-import jakarta.persistence.Id;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")

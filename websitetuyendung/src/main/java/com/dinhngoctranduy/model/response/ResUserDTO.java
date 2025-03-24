@@ -1,4 +1,4 @@
-package com.dinhngoctranduy.model.dto;
+package com.dinhngoctranduy.model.response;
 
 import com.dinhngoctranduy.util.constant.Gender;
 import lombok.AllArgsConstructor;

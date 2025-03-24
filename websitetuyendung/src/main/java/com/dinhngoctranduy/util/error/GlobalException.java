@@ -1,6 +1,6 @@
 package com.dinhngoctranduy.util.error;
 
-import com.dinhngoctranduy.model.RestResponse;
+import com.dinhngoctranduy.model.response.RestResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;

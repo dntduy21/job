@@ -1,6 +1,7 @@
-package com.dinhngoctranduy.service;
+package com.dinhngoctranduy.config;
 
 import com.dinhngoctranduy.model.User;
+import com.dinhngoctranduy.service.UserService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

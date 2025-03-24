@@ -1,4 +1,4 @@
-package com.dinhngoctranduy.model.dto;
+package com.dinhngoctranduy.model.response;
 
 import com.dinhngoctranduy.util.constant.Gender;
 import lombok.Getter;
@@ -8,12 +8,11 @@ import java.time.Instant;
 
 @Getter
 @Setter
-public class ResCreateUserDTO {
+public class ResUpdateUserDTO {
     private long id;
     private String name;
-    private String email;
     private Gender gender;
     private String address;
     private int age;
-    private Instant createdAt;
+    private Instant updatedAt;
 }
