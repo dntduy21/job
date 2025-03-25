@@ -36,7 +36,11 @@ public class SecurityUtil {
     private long refreshTokenExpiration;
 
 
-    public String createAccessToken(String email, ResLoginDTO.UserLogin loginDTO) {
+    public String createAccessToken(String email, ResLoginDTO loginDTO) {
+        ResLoginDTO.UserInsideToken userInsideToken = new ResLoginDTO.UserInsideToken();
+        userInsideToken.setId(loginDTO.getUserLogin().getId());
+        userInsideToken.setEmail(loginDTO.getUserLogin().getEmail());
+        userInsideToken.setName(loginDTO.getUserLogin().getName());
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
         List<String> listAuthority = new ArrayList<>();
@@ -46,7 +50,7 @@ public class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("user", loginDTO)
+                .claim("user", userInsideToken)
                 .claim("permission", listAuthority)
                 .build();
 
@@ -55,13 +59,17 @@ public class SecurityUtil {
     }
 
     public String createRefreshToken(String email, ResLoginDTO loginDTO) {
+        ResLoginDTO.UserInsideToken userInsideToken = new ResLoginDTO.UserInsideToken();
+        userInsideToken.setId(loginDTO.getUserLogin().getId());
+        userInsideToken.setEmail(loginDTO.getUserLogin().getEmail());
+        userInsideToken.setName(loginDTO.getUserLogin().getName());
         Instant now = Instant.now();
         Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("user", loginDTO.getUserLogin())
+                .claim("user", userInsideToken)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

@@ -1,10 +1,12 @@
 package com.dinhngoctranduy.service;
 
+import com.dinhngoctranduy.model.Role;
 import com.dinhngoctranduy.model.User;
 import com.dinhngoctranduy.model.response.ResCreateUserDTO;
 import com.dinhngoctranduy.model.response.ResUpdateUserDTO;
 import com.dinhngoctranduy.model.response.ResUserDTO;
 import com.dinhngoctranduy.model.response.ResultPaginationDTO;
+import com.dinhngoctranduy.repository.RoleRepository;
 import com.dinhngoctranduy.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +20,18 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final RoleService roleService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, RoleService roleService) {
         this.userRepository = userRepository;
+        this.roleService = roleService;
     }
 
     public User handleCreateUser(User user) {
+        if (user.getRole() != null) {
+            Role r = this.roleService.fetchById(user.getRole().getId());
+            user.setRole(r != null ? r : null);
+        }
         return this.userRepository.save(user);
     }
 
@@ -49,6 +57,12 @@ public class UserService {
 
     public ResUserDTO resUserDTO(User user) {
         ResUserDTO res = new ResUserDTO();
+        ResUserDTO.RoleUser roleUser = new ResUserDTO.RoleUser();
+        if (user.getRole() != null) {
+            roleUser.setId(user.getRole().getId());
+            roleUser.setName(user.getRole().getName());
+            res.setRole(roleUser);
+        }
         res.setId(user.getId());
         res.setEmail(user.getEmail());
         res.setName(user.getName());
@@ -81,15 +95,7 @@ public class UserService {
         rs.setMeta(meta);
 
         List<ResUserDTO> listUser = page.getContent()
-                .stream().map(item -> new ResUserDTO(
-                        item.getId(),
-                        item.getEmail(),
-                        item.getName(),
-                        item.getGender(),
-                        item.getAddress(),
-                        item.getAge(),
-                        item.getCreatedAt(),
-                        item.getUpdatedAt()))
+                .stream().map(item -> this.resUserDTO(item))
                 .collect(Collectors.toList());
         rs.setResult(listUser);
         return rs;
@@ -102,6 +108,10 @@ public class UserService {
             currentUser.setGender(user.getGender());
             currentUser.setName(user.getName());
             currentUser.setEmail(user.getEmail());
+            if (user.getRole() != null) {
+                Role r = this.roleService.fetchById(user.getRole().getId());
+                currentUser.setRole(r != null ? r : null);
+            }
             currentUser = this.userRepository.save(currentUser);
         }
         return currentUser;

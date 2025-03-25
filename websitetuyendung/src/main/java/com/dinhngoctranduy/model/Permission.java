@@ -1,22 +1,22 @@
 package com.dinhngoctranduy.model;
 
 import com.dinhngoctranduy.util.SecurityUtil;
-import com.dinhngoctranduy.util.constant.Level;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
 import java.util.List;
 
 @Entity
-@Table(name = "jobs")
+@Table(name = "permissions")
 @Getter
 @Setter
-public class Job {
+@NoArgsConstructor
+public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -24,35 +24,30 @@ public class Job {
     @NotBlank(message = "name không được để trống")
     private String name;
 
-    @NotBlank(message = "location không được để trống")
-    private String location;
+    @NotBlank(message = "apiPath không được để trống")
+    private String apiPath;
 
-    private double salary;
+    @NotBlank(message = "method không được để trống")
+    private String method;
 
-    private int quantity;
+    @NotBlank(message = "module không được để trống")
+    private String module;
 
-    @Enumerated(EnumType.STRING)
-    private Level level;
-
-    @Column(columnDefinition = "MEDIUMTEXT")
-    private String description;
-
-    private Instant startDate;
-    private Instant endDate;
-    private boolean active;
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"jobs"})
-    @JoinTable(name = "job_skill", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
-    private List<Skill> skills;
+    public Permission(String name, String apiPath, String method, String module) {
+        this.name = name;
+        this.apiPath = apiPath;
+        this.method = method;
+        this.module = module;
+    }
 
-    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "permissions")
     @JsonIgnore
-    List<Resume> resumes;
+    private List<Role> roles;
 
     @PrePersist
     public void handleBeforeCreate() {

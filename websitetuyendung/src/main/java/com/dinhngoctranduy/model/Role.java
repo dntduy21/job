@@ -1,7 +1,6 @@
 package com.dinhngoctranduy.model;
 
 import com.dinhngoctranduy.util.SecurityUtil;
-import com.dinhngoctranduy.util.constant.Level;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -13,10 +12,10 @@ import java.time.Instant;
 import java.util.List;
 
 @Entity
-@Table(name = "jobs")
+@Table(name = "roles")
 @Getter
 @Setter
-public class Job {
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -24,21 +23,7 @@ public class Job {
     @NotBlank(message = "name không được để trống")
     private String name;
 
-    @NotBlank(message = "location không được để trống")
-    private String location;
-
-    private double salary;
-
-    private int quantity;
-
-    @Enumerated(EnumType.STRING)
-    private Level level;
-
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
-
-    private Instant startDate;
-    private Instant endDate;
     private boolean active;
     private Instant createdAt;
     private Instant updatedAt;
@@ -46,13 +31,13 @@ public class Job {
     private String updatedBy;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"jobs"})
-    @JoinTable(name = "job_skill", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
-    private List<Skill> skills;
+    @JsonIgnoreProperties(value = {"roles"})
+    @JoinTable(name = "permission_role", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
+    private List<Permission> permissions;
 
-    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     @JsonIgnore
-    List<Resume> resumes;
+    List<User> users;
 
     @PrePersist
     public void handleBeforeCreate() {
