@@ -1,5 +1,6 @@
 package com.dinhngoctranduy.controller;
 
+import com.dinhngoctranduy.config.Translator;
 import com.dinhngoctranduy.model.response.file.ResUploadFileDTO;
 import com.dinhngoctranduy.service.FileService;
 import com.dinhngoctranduy.util.annotation.Message;
@@ -37,14 +38,14 @@ public class FileController {
     public ResponseEntity<ResUploadFileDTO> upload(@RequestParam(name = "file", required = false) MultipartFile file,
                                                    @RequestParam(name = "folder") String folder) throws URISyntaxException, IOException, StorageException {
         if (file == null || file.isEmpty()) {
-            throw new StorageException("File is empty");
+            throw new StorageException(Translator.toLocale("file.empty"));
         }
         String fileName = file.getOriginalFilename();
         List<String> allowedExtensions = Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx");
         boolean isValid = allowedExtensions.stream().anyMatch(item -> fileName.toLowerCase().endsWith(item));
 
         if (!isValid) {
-            throw new StorageException("Extension file only allows " + allowedExtensions.toString());
+            throw new StorageException(Translator.toLocale("file.extension.invalid", allowedExtensions.toString()));
         }
         this.fileService.createDirectory(baseURI + folder);
         String uploadFile = this.fileService.store(file, folder);
@@ -59,13 +60,13 @@ public class FileController {
             @RequestParam(name = "folder", required = false) String folder)
             throws StorageException, URISyntaxException, FileNotFoundException {
         if (fileName == null || folder == null) {
-            throw new StorageException("Missing required params : (fileName or folder) in query params.");
+            throw new StorageException(Translator.toLocale("file.params.missing"));
         }
 
         // check file exist (and not a directory)
         long fileLength = this.fileService.getFileLength(fileName, folder);
         if (fileLength == 0) {
-            throw new StorageException("File with name = " + fileName + " not found.");
+            throw new StorageException(Translator.toLocale("file.not.found", fileName));
         }
 
         // download a file

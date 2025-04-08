@@ -1,5 +1,6 @@
 package com.dinhngoctranduy.controller;
 
+import com.dinhngoctranduy.config.Translator;
 import com.dinhngoctranduy.model.Permission;
 import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.service.PermissionService;
@@ -28,7 +29,7 @@ public class PermissionController {
     public ResponseEntity<Permission> create(@Valid @RequestBody Permission p) throws IdInvalidException {
         // check exist
         if (this.permissionService.isPermissionExist(p)) {
-            throw new IdInvalidException("Permission đã tồn tại.");
+            throw new IdInvalidException(Translator.toLocale("permission.exists"));
         }
 
         // create new permission
@@ -40,14 +41,14 @@ public class PermissionController {
     public ResponseEntity<Permission> update(@Valid @RequestBody Permission p) throws IdInvalidException {
         // check exist by id
         if (this.permissionService.fetchById(p.getId()) == null) {
-            throw new IdInvalidException("Permission với id = " + p.getId() + " không tồn tại.");
+            throw new IdInvalidException(Translator.toLocale("permission.not.found.id", p.getId()));
         }
 
         // check exist by module, apiPath and method
         if (this.permissionService.isPermissionExist(p)) {
             // check name
             if (this.permissionService.isSameName(p)) {
-                throw new IdInvalidException("Permission đã tồn tại.");
+                throw new IdInvalidException(Translator.toLocale("permission.exists"));
             }
         }
 
@@ -60,7 +61,7 @@ public class PermissionController {
     public ResponseEntity<Void> delete(@PathVariable("id") long id) throws IdInvalidException {
         // check exist by id
         if (this.permissionService.fetchById(id) == null) {
-            throw new IdInvalidException("Permission với id = " + id + " không tồn tại.");
+            throw new IdInvalidException(Translator.toLocale("permission.not.found.id", id));
         }
         this.permissionService.delete(id);
         return ResponseEntity.ok().body(null);

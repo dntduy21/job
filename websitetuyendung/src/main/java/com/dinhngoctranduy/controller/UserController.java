@@ -1,5 +1,6 @@
 package com.dinhngoctranduy.controller;
 
+import com.dinhngoctranduy.config.Translator;
 import com.dinhngoctranduy.model.User;
 import com.dinhngoctranduy.model.response.ResCreateUserDTO;
 import com.dinhngoctranduy.model.response.ResUpdateUserDTO;
@@ -33,7 +34,7 @@ public class UserController {
     public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User user) throws IdInvalidException {
         boolean existsEmail = this.userService.isEmailExists(user.getEmail());
         if (existsEmail) {
-            throw new IdInvalidException("Email " + user.getEmail() + " đã tồn tại");
+            throw new IdInvalidException(Translator.toLocale("user.email.exists", user.getEmail()));
         }
         String hashPassword = this.passwordEncoder.encode(user.getPassword());
         user.setPassword(hashPassword);
@@ -46,7 +47,7 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable long id) throws IdInvalidException {
         User curUser = this.userService.fetchUserById(id);
         if (curUser == null) {
-            throw new IdInvalidException("User với id = " + id + " Không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("user.not.found.id", id));
         }
         this.userService.handleDeleteUser(id);
         return ResponseEntity.ok(null);
@@ -57,7 +58,7 @@ public class UserController {
     public ResponseEntity<ResUserDTO> getUserById(@PathVariable long id) throws IdInvalidException {
         User curUser = this.userService.fetchUserById(id);
         if (curUser == null) {
-            throw new IdInvalidException("User với id = " + id + " Không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("user.not.found.id", id));
         }
         return ResponseEntity.ok(this.userService.resUserDTO(curUser));
     }
@@ -72,7 +73,7 @@ public class UserController {
     public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody User user) throws IdInvalidException {
         User updateUser = this.userService.handleUpdateUser(user);
         if (updateUser == null) {
-            throw new IdInvalidException("User với id = " + user.getId() + " không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("user.not.found.id", user.getId()));
         }
         return ResponseEntity.ok(this.userService.resUpdateUserDTO(updateUser));
     }

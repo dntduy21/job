@@ -1,5 +1,6 @@
 package com.dinhngoctranduy.controller;
 
+import com.dinhngoctranduy.config.Translator;
 import com.dinhngoctranduy.model.User;
 import com.dinhngoctranduy.model.request.ReqLoginDTO;
 import com.dinhngoctranduy.model.response.ResCreateUserDTO;
@@ -74,7 +75,7 @@ public class AuthController {
     }
 
     @GetMapping("/auth/account")
-    @Message("fetch account")
+    @Message("Get account")
     public ResponseEntity<ResLoginDTO.UserGetAccount> getAccount() {
         String email = SecurityUtil.getCurrentUserLogin().isPresent()
                 ? SecurityUtil.getCurrentUserLogin().get()
@@ -101,8 +102,7 @@ public class AuthController {
     public ResponseEntity<ResCreateUserDTO> register(@Valid @RequestBody User user) throws IdInvalidException {
         boolean isEmailExist = this.userService.isEmailExists(user.getEmail());
         if (isEmailExist) {
-            throw new IdInvalidException(
-                    "Email " + user.getEmail() + "đã tồn tại, vui lòng sử dụng email khác.");
+            throw new IdInvalidException(Translator.toLocale("user.email.exists", user.getEmail()));
         }
 
         String hashPassword = this.passwordEncoder.encode(user.getPassword());
@@ -116,7 +116,7 @@ public class AuthController {
     public ResponseEntity<ResLoginDTO> getRefreshToken(
             @CookieValue(name = "refresh_token", defaultValue = "token") String refresh_token) throws IdInvalidException {
         if (refresh_token.equals("token")) {
-            throw new IdInvalidException("Bạn không có refresh token ở cookie");
+            throw new IdInvalidException(Translator.toLocale("auth.missing_refresh_token"));
         }
         // check valid
         Jwt decodedToken = this.securityUtil.checkValidRefreshToken(refresh_token);
@@ -125,7 +125,7 @@ public class AuthController {
         // check user by token + email
         User currentUser = this.userService.getUserByRefreshTokenAndEmail(refresh_token, email);
         if (currentUser == null) {
-            throw new IdInvalidException("Refresh Token không hợp lệ");
+            throw new IdInvalidException(Translator.toLocale("auth.refresh_token.invalid"));
         }
 
         // issue new token/set refresh token as cookies
@@ -170,7 +170,7 @@ public class AuthController {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
 
         if (email.equals("")) {
-            throw new IdInvalidException("Access Token không hợp lệ");
+            throw new IdInvalidException(Translator.toLocale("auth.token.invalid"));
         }
 
         // update refresh token = null

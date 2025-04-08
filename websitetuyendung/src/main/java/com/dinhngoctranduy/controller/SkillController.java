@@ -1,5 +1,6 @@
 package com.dinhngoctranduy.controller;
 
+import com.dinhngoctranduy.config.Translator;
 import com.dinhngoctranduy.model.Skill;
 import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.service.SkillService;
@@ -28,7 +29,7 @@ public class SkillController {
     public ResponseEntity<Skill> create(@Valid @RequestBody Skill s) throws IdInvalidException {
         // check name
         if (s.getName() != null && this.skillService.isNameExist(s.getName())) {
-            throw new IdInvalidException("Skill name = " + s.getName() + " đã tồn tại");
+            throw new IdInvalidException(Translator.toLocale("skill.exists.name", s.getName()));
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(this.skillService.createSkill(s));
     }
@@ -39,12 +40,12 @@ public class SkillController {
         // check id
         Skill currentSkill = this.skillService.fetchSkillById(s.getId());
         if (currentSkill == null) {
-            throw new IdInvalidException("Skill id = " + s.getId() + " không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("skill.not.found.id", s.getId()));
         }
 
         // check name
         if (s.getName() != null && this.skillService.isNameExist(s.getName())) {
-            throw new IdInvalidException("Skill name = " + s.getName() + " đã tồn tại");
+            throw new IdInvalidException(Translator.toLocale("skill.exists.name", s.getName()));
         }
 
         currentSkill.setName(s.getName());
@@ -57,7 +58,7 @@ public class SkillController {
         // check id
         Skill currentSkill = this.skillService.fetchSkillById(id);
         if (currentSkill == null) {
-            throw new IdInvalidException("Skill id = " + id + " không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("skill.not.found.id", id));
         }
         this.skillService.deleteSkill(id);
         return ResponseEntity.ok().body(null);

@@ -1,5 +1,6 @@
 package com.dinhngoctranduy.controller;
 
+import com.dinhngoctranduy.config.Translator;
 import com.dinhngoctranduy.model.Job;
 import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.model.response.job.ResCreateJobDTO;
@@ -39,7 +40,7 @@ public class JobController {
     public ResponseEntity<ResUpdateJobDTO> update(@Valid @RequestBody Job job) throws IdInvalidException {
         Optional<Job> currentJob = this.jobService.fetchJobById(job.getId());
         if (!currentJob.isPresent()) {
-            throw new IdInvalidException("Job not found");
+            throw new IdInvalidException(Translator.toLocale("job.not.found"));
         }
 
         return ResponseEntity.ok()
@@ -51,7 +52,7 @@ public class JobController {
     public ResponseEntity<Void> delete(@PathVariable("id") long id) throws IdInvalidException {
         Optional<Job> currentJob = this.jobService.fetchJobById(id);
         if (!currentJob.isPresent()) {
-            throw new IdInvalidException("Job not found");
+            throw new IdInvalidException(Translator.toLocale("job.not.found"));
         }
         this.jobService.delete(id);
         return ResponseEntity.ok().body(null);
@@ -62,7 +63,7 @@ public class JobController {
     public ResponseEntity<Job> getJob(@PathVariable("id") long id) throws IdInvalidException {
         Optional<Job> currentJob = this.jobService.fetchJobById(id);
         if (!currentJob.isPresent()) {
-            throw new IdInvalidException("Job not found");
+            throw new IdInvalidException(Translator.toLocale("job.not.found"));
         }
 
         return ResponseEntity.ok().body(currentJob.get());

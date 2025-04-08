@@ -1,5 +1,6 @@
 package com.dinhngoctranduy.controller;
 
+import com.dinhngoctranduy.config.Translator;
 import com.dinhngoctranduy.model.Resume;
 import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.model.response.resume.ResCreateResumeDTO;
@@ -34,7 +35,7 @@ public class ResumeController {
         // check id exists
         boolean isIdExist = this.resumeService.checkResumeExistByUserAndJob(resume);
         if (!isIdExist) {
-            throw new IdInvalidException("User id/Job id không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("user.or.job.not.found"));
         }
 
         // create new resume
@@ -47,7 +48,7 @@ public class ResumeController {
         // check id exist
         Optional<Resume> reqResumeOptional = this.resumeService.fetchById(resume.getId());
         if (reqResumeOptional.isEmpty()) {
-            throw new IdInvalidException("Resume với id = " + resume.getId() + " không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("resume.not.found.id", resume.getId()));
         }
 
         Resume reqResume = reqResumeOptional.get();
@@ -61,7 +62,7 @@ public class ResumeController {
     public ResponseEntity<Void> delete(@PathVariable("id") long id) throws IdInvalidException {
         Optional<Resume> reqResumeOptional = this.resumeService.fetchById(id);
         if (reqResumeOptional.isEmpty()) {
-            throw new IdInvalidException("Resume với id = " + id + " không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("resume.not.found.id", id));
         }
 
         this.resumeService.delete(id);
@@ -73,7 +74,7 @@ public class ResumeController {
     public ResponseEntity<ResFetchResumeDTO> fetchById(@PathVariable("id") long id) throws IdInvalidException {
         Optional<Resume> reqResumeOptional = this.resumeService.fetchById(id);
         if (reqResumeOptional.isEmpty()) {
-            throw new IdInvalidException("Resume với id = " + id + " không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("resume.not.found.id", id));
         }
 
         return ResponseEntity.ok().body(this.resumeService.getResume(reqResumeOptional.get()));

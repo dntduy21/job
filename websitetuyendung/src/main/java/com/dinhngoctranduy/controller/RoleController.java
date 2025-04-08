@@ -1,5 +1,6 @@
 package com.dinhngoctranduy.controller;
 
+import com.dinhngoctranduy.config.Translator;
 import com.dinhngoctranduy.model.Role;
 import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.service.RoleService;
@@ -28,7 +29,7 @@ public class RoleController {
     public ResponseEntity<Role> create(@Valid @RequestBody Role r) throws IdInvalidException {
         // check name
         if (this.roleService.existByName(r.getName())) {
-            throw new IdInvalidException("Role với name = " + r.getName() + " đã tồn tại");
+            throw new IdInvalidException(Translator.toLocale("role.exists.name", r.getName()));
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(this.roleService.create(r));
     }
@@ -38,7 +39,7 @@ public class RoleController {
     public ResponseEntity<Role> update(@Valid @RequestBody Role r) throws IdInvalidException {
         // check id
         if (this.roleService.fetchById(r.getId()) == null) {
-            throw new IdInvalidException("Role với id = " + r.getId() + " không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("role.not.found.id", r.getId()));
         }
 
         return ResponseEntity.ok().body(this.roleService.update(r));
@@ -49,7 +50,7 @@ public class RoleController {
     public ResponseEntity<Void> delete(@PathVariable("id") long id) throws IdInvalidException {
         // check id
         if (this.roleService.fetchById(id) == null) {
-            throw new IdInvalidException("Role với id = " + id + " không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("role.not.found.id", id));
         }
         this.roleService.delete(id);
         return ResponseEntity.ok().body(null);
@@ -69,7 +70,7 @@ public class RoleController {
 
         Role role = this.roleService.fetchById(id);
         if (role == null) {
-            throw new IdInvalidException("Resume với id = " + id + " không tồn tại");
+            throw new IdInvalidException(Translator.toLocale("role.not.found.id", id));
         }
 
         return ResponseEntity.ok().body(role);
