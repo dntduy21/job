@@ -33,6 +33,12 @@ public class Resume {
     private String createdBy;
     private String updatedBy;
 
+    @Column(name = "is_parsed")
+    private boolean isParsed = false;
+
+    @OneToOne(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ResumeDetails resumeDetails;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

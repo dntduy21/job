@@ -6,6 +6,7 @@ import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.model.response.resume.ResCreateResumeDTO;
 import com.dinhngoctranduy.model.response.resume.ResFetchResumeDTO;
 import com.dinhngoctranduy.model.response.resume.ResUpdateResumeDTO;
+import com.dinhngoctranduy.service.CvAnalysisService;
 import com.dinhngoctranduy.service.ResumeService;
 import com.dinhngoctranduy.util.annotation.Message;
 import com.dinhngoctranduy.util.error.IdInvalidException;
@@ -18,28 +19,43 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/v1")
 public class ResumeController {
 
     private final ResumeService resumeService;
+    private final CvAnalysisService cvAnalysisService;
 
-    public ResumeController(ResumeService resumeService) {
+    public ResumeController(ResumeService resumeService, CvAnalysisService cvAnalysisService) {
         this.resumeService = resumeService;
+        this.cvAnalysisService = cvAnalysisService;
     }
 
     @PostMapping("/resumes")
     @Message("Create a resume")
     public ResponseEntity<ResCreateResumeDTO> create(@Valid @RequestBody Resume resume) throws IdInvalidException {
-        // check id exists
         boolean isIdExist = this.resumeService.checkResumeExistByUserAndJob(resume);
         if (!isIdExist) {
             throw new IdInvalidException(Translator.toLocale("user.or.job.not.found"));
         }
 
-        // create new resume
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.resumeService.create(resume));
+        // 1. Lưu resume
+        ResCreateResumeDTO res = this.resumeService.create(resume);
+
+        // 2. Tự động phân tích nếu hợp lệ
+        CompletableFuture.runAsync(() -> {
+            try {
+                Optional<Resume> resumeOptional = resumeService.fetchById(res.getId());
+                resumeOptional.ifPresent(r -> cvAnalysisService.analyzeIfEligible(r));
+            } catch (Exception e) {
+                System.err.println("Auto-analysis failed after creating resume.");
+                e.printStackTrace();
+            }
+        });
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     @PutMapping("/resumes")

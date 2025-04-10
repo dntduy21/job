@@ -6,7 +6,6 @@ import com.dinhngoctranduy.model.response.ResCreateUserDTO;
 import com.dinhngoctranduy.model.response.ResUpdateUserDTO;
 import com.dinhngoctranduy.model.response.ResUserDTO;
 import com.dinhngoctranduy.model.response.ResultPaginationDTO;
-import com.dinhngoctranduy.repository.RoleRepository;
 import com.dinhngoctranduy.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
