@@ -11,12 +11,7 @@ import com.dinhngoctranduy.repository.JobRepository;
 import com.dinhngoctranduy.repository.ResumeRepository;
 import com.dinhngoctranduy.repository.UserRepository;
 import com.dinhngoctranduy.util.SecurityUtil;
-import com.turkraft.springfilter.builder.FilterBuilder;
-import com.turkraft.springfilter.converter.FilterSpecification;
-import com.turkraft.springfilter.converter.FilterSpecificationConverter;
-import com.turkraft.springfilter.parser.FilterParser;
-import com.turkraft.springfilter.parser.node.FilterNode;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dinhngoctranduy.util.specification.ResumeSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,15 +23,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ResumeService {
-    @Autowired
-    FilterBuilder fb;
-
-    @Autowired
-    private FilterParser filterParser;
-
-    @Autowired
-    private FilterSpecificationConverter filterSpecificationConverter;
-
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
@@ -136,28 +122,39 @@ public class ResumeService {
     }
 
     public ResultPaginationDTO fetchResumeByUser(Pageable pageable) {
-        // query builder
-        String email = SecurityUtil.getCurrentUserLogin().isPresent() == true
-                ? SecurityUtil.getCurrentUserLogin().get()
-                : "";
-        FilterNode node = filterParser.parse("email='" + email + "'");
-        FilterSpecification<Resume> spec = filterSpecificationConverter.convert(node);
+        // Lấy email người dùng hiện tại
+        String email = SecurityUtil.getCurrentUserLogin().orElse("");
+
+        // Gọi spec filter theo email
+        Specification<Resume> spec = ResumeSpecification.withAllFilters(
+                email,     // email
+                null,      // url
+                null,      // status
+                null,      // isParsed
+                null,      // userId
+                null,      // jobId
+                null,      // skills
+                null,      // education
+                null,      // address
+                null,      // minYearsOfExperience
+                null,      // maxYearsOfExperience
+                null       // certificate
+        );
+
         Page<Resume> pageResume = this.resumeRepository.findAll(spec, pageable);
 
+        // Tạo meta
         ResultPaginationDTO rs = new ResultPaginationDTO();
         ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
-
         mt.setPage(pageable.getPageNumber() + 1);
         mt.setPageSize(pageable.getPageSize());
-
         mt.setPages(pageResume.getTotalPages());
         mt.setTotal(pageResume.getTotalElements());
-
         rs.setMeta(mt);
 
-        // remove sensitive data
+        // Map về DTO (ẩn field nhạy cảm nếu cần)
         List<ResFetchResumeDTO> listResume = pageResume.getContent()
-                .stream().map(item -> this.getResume(item))
+                .stream().map(this::getResume)
                 .collect(Collectors.toList());
 
         rs.setResult(listResume);

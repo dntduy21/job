@@ -6,7 +6,7 @@ import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.service.SkillService;
 import com.dinhngoctranduy.util.annotation.Message;
 import com.dinhngoctranduy.util.error.IdInvalidException;
-import com.turkraft.springfilter.boot.Filter;
+import com.dinhngoctranduy.util.specification.SkillSpecification;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -66,11 +66,11 @@ public class SkillController {
 
     @GetMapping("/skills")
     @Message("fetch all skills")
-    public ResponseEntity<ResultPaginationDTO> getAll(
-            @Filter Specification<Skill> spec,
-            Pageable pageable) {
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-                this.skillService.fetchAllSkills(spec, pageable));
+    public ResponseEntity<ResultPaginationDTO> getAllSkills(
+            @RequestParam(required = false) String name,
+            Pageable pageable
+    ) {
+        Specification<Skill> spec = SkillSpecification.withFilters(name);
+        return ResponseEntity.ok(skillService.fetchAllSkills(spec, pageable));
     }
 }

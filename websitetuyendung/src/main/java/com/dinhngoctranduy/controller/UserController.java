@@ -9,7 +9,7 @@ import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.service.UserService;
 import com.dinhngoctranduy.util.annotation.Message;
 import com.dinhngoctranduy.util.error.IdInvalidException;
-import com.turkraft.springfilter.boot.Filter;
+import com.dinhngoctranduy.util.specification.UserSpecification;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -65,8 +65,17 @@ public class UserController {
 
     @GetMapping("/users")
     @Message("get all users")
-    public ResponseEntity<ResultPaginationDTO> getAllUser(@Filter Specification<User> specification, Pageable pageable) {
-        return ResponseEntity.ok(this.userService.fetchAllUser(specification, pageable));
+    public ResponseEntity<ResultPaginationDTO> getAllUser(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) Integer age,
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) Long roleId,
+            Pageable pageable
+    ) {
+        Specification<User> spec = UserSpecification.withFilters(name, email, age, gender, address, roleId);
+        return ResponseEntity.ok(userService.fetchAllUser(spec, pageable));
     }
 
     @PutMapping("/users")

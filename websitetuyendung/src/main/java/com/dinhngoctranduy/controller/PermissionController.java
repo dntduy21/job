@@ -6,7 +6,7 @@ import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.service.PermissionService;
 import com.dinhngoctranduy.util.annotation.Message;
 import com.dinhngoctranduy.util.error.IdInvalidException;
-import com.turkraft.springfilter.boot.Filter;
+import com.dinhngoctranduy.util.specification.PermissionSpecification;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -70,8 +70,12 @@ public class PermissionController {
     @GetMapping("/permissions")
     @Message("Fetch permissions")
     public ResponseEntity<ResultPaginationDTO> getPermissions(
-            @Filter Specification<Permission> spec, Pageable pageable) {
-
-        return ResponseEntity.ok(this.permissionService.getPermissions(spec, pageable));
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String module,
+            Pageable pageable
+    ) {
+        Specification<Permission> spec = PermissionSpecification.withFilters(name, description, module);
+        return ResponseEntity.ok(permissionService.getPermissions(spec, pageable));
     }
 }

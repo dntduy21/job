@@ -6,7 +6,7 @@ import com.dinhngoctranduy.model.response.ResultPaginationDTO;
 import com.dinhngoctranduy.service.RoleService;
 import com.dinhngoctranduy.util.annotation.Message;
 import com.dinhngoctranduy.util.error.IdInvalidException;
-import com.turkraft.springfilter.boot.Filter;
+import com.dinhngoctranduy.util.specification.RoleSpecification;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -58,10 +58,13 @@ public class RoleController {
 
     @GetMapping("/roles")
     @Message("Fetch roles")
-    public ResponseEntity<ResultPaginationDTO> getPermissions(
-            @Filter Specification<Role> spec, Pageable pageable) {
-
-        return ResponseEntity.ok(this.roleService.getRoles(spec, pageable));
+    public ResponseEntity<ResultPaginationDTO> getRoles(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String description,
+            Pageable pageable
+    ) {
+        Specification<Role> spec = RoleSpecification.withFilters(name, description);
+        return ResponseEntity.ok(roleService.getRoles(spec, pageable));
     }
 
     @GetMapping("/roles/{id}")

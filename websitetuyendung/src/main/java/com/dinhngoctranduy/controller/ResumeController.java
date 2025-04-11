@@ -9,8 +9,9 @@ import com.dinhngoctranduy.model.response.resume.ResUpdateResumeDTO;
 import com.dinhngoctranduy.service.CvAnalysisService;
 import com.dinhngoctranduy.service.ResumeService;
 import com.dinhngoctranduy.util.annotation.Message;
+import com.dinhngoctranduy.util.constant.ResumeState;
 import com.dinhngoctranduy.util.error.IdInvalidException;
-import com.turkraft.springfilter.boot.Filter;
+import com.dinhngoctranduy.util.specification.ResumeSpecification;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -98,11 +100,30 @@ public class ResumeController {
 
     @GetMapping("/resumes")
     @Message("Fetch all resume with paginate")
-    public ResponseEntity<ResultPaginationDTO> fetchAll(@Filter Specification<Resume> spec,
-                                                        Pageable pageable) {
-
-        return ResponseEntity.ok().body(this.resumeService.fetchAllResume(spec, pageable));
+    public ResponseEntity<ResultPaginationDTO> fetchAll(
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String url,
+            @RequestParam(required = false) ResumeState status,
+            @RequestParam(required = false) Boolean isParsed,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long jobId,
+            @RequestParam(required = false) List<String> skills,
+            @RequestParam(required = false) String education,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) Integer minYearsOfExperience,
+            @RequestParam(required = false) Integer maxYearsOfExperience,
+            @RequestParam(required = false) String certificate,
+            Pageable pageable
+    ) {
+        Specification<Resume> spec = ResumeSpecification.withAllFilters(
+                email, url, status, isParsed, userId, jobId,
+                skills, education, address,
+                minYearsOfExperience, maxYearsOfExperience,
+                certificate
+        );
+        return ResponseEntity.ok(resumeService.fetchAllResume(spec, pageable));
     }
+
 
     @PostMapping("/resumes/by-user")
     @Message("Get list resumes by user")

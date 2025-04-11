@@ -8,7 +8,7 @@ import com.dinhngoctranduy.model.response.job.ResUpdateJobDTO;
 import com.dinhngoctranduy.service.JobService;
 import com.dinhngoctranduy.util.annotation.Message;
 import com.dinhngoctranduy.util.error.IdInvalidException;
-import com.turkraft.springfilter.boot.Filter;
+import com.dinhngoctranduy.util.specification.JobSpecification;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -71,10 +71,14 @@ public class JobController {
 
     @GetMapping("/jobs")
     @Message("Get job with pagination")
-    public ResponseEntity<ResultPaginationDTO> getAllJob(
-            @Filter Specification<Job> spec,
-            Pageable pageable) {
-
-        return ResponseEntity.ok().body(this.jobService.fetchAll(spec, pageable));
+    public ResponseEntity<ResultPaginationDTO> getAllJobs(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String level,
+            Pageable pageable
+    ) {
+        Specification<Job> spec = JobSpecification.withFilters(name, location, level);
+        ResultPaginationDTO result = jobService.fetchAll(spec, pageable);
+        return ResponseEntity.ok(result);
     }
 }
