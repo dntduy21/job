@@ -58,12 +58,12 @@ public class CvAnalysisService {
 
             String text = PdfUtil.extractTextFromPdf(filePath);
 
-            if (!isEnglish(text) || !isAtsCompliant(text)) {
-                System.out.println("Resume not ATS-compliant or not in English: " + fileName);
+            if (!isAtsCompliant(text)) {
+                System.out.println("Resume not ATS-compliant: " + fileName);
                 return;
             }
 
-            analyzeAndSave(fileName); // gọi phân tích chính
+            analyzeAndSave(fileName); // Gọi phân tích chính
 
         } catch (Exception e) {
             System.err.println("Error analyzing resume: " + fileName);
@@ -80,10 +80,6 @@ public class CvAnalysisService {
             }
 
             String text = PdfUtil.extractTextFromPdf(filePath);
-
-            if (!isEnglish(text)) {
-                throw new RuntimeException("CV is not in English. Only English ATS-friendly CVs are accepted.");
-            }
 
             if (!isAtsCompliant(text)) {
                 throw new RuntimeException("CV is not ATS-friendly. Use a simple, text-based format.");
@@ -121,12 +117,6 @@ public class CvAnalysisService {
             e.printStackTrace();
             throw new RuntimeException("Failed to analyze and save resume: " + fileName, e);
         }
-    }
-
-    private boolean isEnglish(String text) {
-        long englishHits = List.of("experience", "education", "skills", "certification", "summary")
-                .stream().filter(text.toLowerCase()::contains).count();
-        return englishHits >= 2;
     }
 
     private boolean isAtsCompliant(String text) {

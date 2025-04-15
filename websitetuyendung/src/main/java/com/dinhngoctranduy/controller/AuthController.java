@@ -9,6 +9,8 @@ import com.dinhngoctranduy.service.UserService;
 import com.dinhngoctranduy.util.SecurityUtil;
 import com.dinhngoctranduy.util.annotation.Message;
 import com.dinhngoctranduy.util.error.IdInvalidException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +27,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
+@Tag(
+        name = "Xác thực & Phân quyền",
+        description = "Các API phục vụ việc đăng ký, đăng nhập, đăng xuất, làm mới token và truy xuất thông tin người dùng đã xác thực."
+)
 public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
@@ -44,6 +50,10 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Operation(
+            summary = "Đăng nhập người dùng",
+            description = "Xác thực tài khoản người dùng bằng tên đăng nhập và mật khẩu. Trả về access token và lưu refresh token vào cookie bảo mật (HttpOnly)."
+    )
     @PostMapping("/auth/login")
     public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody ReqLoginDTO loginDTO) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword());
@@ -74,6 +84,10 @@ public class AuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(res);
     }
 
+    @Operation(
+            summary = "Lấy thông tin người dùng hiện tại",
+            description = "Truy xuất thông tin người dùng đang đăng nhập dựa trên access token."
+    )
     @GetMapping("/auth/account")
     @Message("Get account")
     public ResponseEntity<ResLoginDTO.UserGetAccount> getAccount() {
@@ -97,6 +111,10 @@ public class AuthController {
         return ResponseEntity.ok().body(userGetAccount);
     }
 
+    @Operation(
+            summary = "Đăng ký người dùng mới",
+            description = "Tạo mới một tài khoản người dùng với mật khẩu đã mã hóa. Nếu email đã tồn tại, sẽ trả về lỗi."
+    )
     @PostMapping("/auth/register")
     @Message("Register a new user")
     public ResponseEntity<ResCreateUserDTO> register(@Valid @RequestBody User user) throws IdInvalidException {
@@ -111,6 +129,10 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.resCreateUserDTO(new_user));
     }
 
+    @Operation(
+            summary = "Làm mới access token",
+            description = "Kiểm tra tính hợp lệ của refresh token từ cookie và phát hành access token mới kèm theo refresh token mới."
+    )
     @GetMapping("/auth/refresh")
     @Message("Get User by refresh token")
     public ResponseEntity<ResLoginDTO> getRefreshToken(
@@ -164,6 +186,10 @@ public class AuthController {
                 .body(res);
     }
 
+    @Operation(
+            summary = "Đăng xuất người dùng",
+            description = "Xóa refresh token trong hệ thống và loại bỏ cookie khỏi trình duyệt, chấm dứt phiên đăng nhập."
+    )
     @PostMapping("/auth/logout")
     @Message("Logout User")
     public ResponseEntity<Void> logout() throws IdInvalidException {

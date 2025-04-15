@@ -5,6 +5,8 @@ import com.dinhngoctranduy.model.response.file.ResUploadFileDTO;
 import com.dinhngoctranduy.service.FileService;
 import com.dinhngoctranduy.util.annotation.Message;
 import com.dinhngoctranduy.util.error.StorageException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -23,6 +25,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@Tag(
+        name = "Quản lý tệp",
+        description = "Các API cho phép người dùng tải lên và tải xuống tệp theo thư mục chỉ định."
+)
 public class FileController {
     @Value("${upload-file.base-uri}")
     private String baseURI;
@@ -33,7 +39,11 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @PostMapping("/files")
+    @Operation(
+            summary = "Tải lên tệp",
+            description = "Tải lên một tệp đơn vào thư mục chỉ định. Chỉ chấp nhận định dạng: pdf."
+    )
+    @PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Message("upload single file")
     public ResponseEntity<ResUploadFileDTO> upload(@RequestParam(name = "file", required = false) MultipartFile file,
                                                    @RequestParam(name = "folder") String folder) throws URISyntaxException, IOException, StorageException {
@@ -41,7 +51,7 @@ public class FileController {
             throw new StorageException(Translator.toLocale("file.empty"));
         }
         String fileName = file.getOriginalFilename();
-        List<String> allowedExtensions = Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx");
+        List<String> allowedExtensions = Arrays.asList("pdf");
         boolean isValid = allowedExtensions.stream().anyMatch(item -> fileName.toLowerCase().endsWith(item));
 
         if (!isValid) {
@@ -53,6 +63,10 @@ public class FileController {
         return ResponseEntity.ok(resUploadFileDTO);
     }
 
+    @Operation(
+            summary = "Tải xuống tệp",
+            description = "Tải xuống tệp từ thư mục chỉ định. Yêu cầu phải truyền đúng tên tệp và tên thư mục."
+    )
     @GetMapping("/files")
     @Message("Download a file")
     public ResponseEntity<Resource> download(

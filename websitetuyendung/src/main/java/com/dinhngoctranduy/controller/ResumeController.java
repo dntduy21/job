@@ -12,6 +12,8 @@ import com.dinhngoctranduy.util.annotation.Message;
 import com.dinhngoctranduy.util.constant.ResumeState;
 import com.dinhngoctranduy.util.error.IdInvalidException;
 import com.dinhngoctranduy.util.specification.ResumeSpecification;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,6 +27,10 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/v1")
+@Tag(
+        name = "Quản lý hồ sơ (CV)",
+        description = "Các API cho phép tạo, cập nhật, xoá, truy vấn hồ sơ ứng tuyển và phân tích CV tự động."
+)
 public class ResumeController {
 
     private final ResumeService resumeService;
@@ -37,6 +43,10 @@ public class ResumeController {
 
     @PostMapping("/resumes")
     @Message("Create a resume")
+    @Operation(
+            summary = "Tạo hồ sơ ứng tuyển",
+            description = "Tạo hồ sơ mới cho người dùng với công việc đã chọn. Tự động phân tích nếu đủ điều kiện."
+    )
     public ResponseEntity<ResCreateResumeDTO> create(@Valid @RequestBody Resume resume) throws IdInvalidException {
         boolean isIdExist = this.resumeService.checkResumeExistByUserAndJob(resume);
         if (!isIdExist) {
@@ -62,6 +72,10 @@ public class ResumeController {
 
     @PutMapping("/resumes")
     @Message("Update a resume")
+    @Operation(
+            summary = "Cập nhật hồ sơ",
+            description = "Cập nhật trạng thái hồ sơ theo ID. Trả lỗi nếu không tìm thấy."
+    )
     public ResponseEntity<ResUpdateResumeDTO> update(@RequestBody Resume resume) throws IdInvalidException {
         // check id exist
         Optional<Resume> reqResumeOptional = this.resumeService.fetchById(resume.getId());
@@ -77,6 +91,10 @@ public class ResumeController {
 
     @DeleteMapping("/resumes/{id}")
     @Message("Delete a resume by id")
+    @Operation(
+            summary = "Xoá hồ sơ theo ID",
+            description = "Xoá hồ sơ khỏi hệ thống nếu tồn tại."
+    )
     public ResponseEntity<Void> delete(@PathVariable("id") long id) throws IdInvalidException {
         Optional<Resume> reqResumeOptional = this.resumeService.fetchById(id);
         if (reqResumeOptional.isEmpty()) {
@@ -89,6 +107,10 @@ public class ResumeController {
 
     @GetMapping("/resumes/{id}")
     @Message("Fetch a resume by id")
+    @Operation(
+            summary = "Lấy hồ sơ theo ID",
+            description = "Trả về thông tin chi tiết của hồ sơ theo ID."
+    )
     public ResponseEntity<ResFetchResumeDTO> fetchById(@PathVariable("id") long id) throws IdInvalidException {
         Optional<Resume> reqResumeOptional = this.resumeService.fetchById(id);
         if (reqResumeOptional.isEmpty()) {
@@ -100,6 +122,10 @@ public class ResumeController {
 
     @GetMapping("/resumes")
     @Message("Fetch all resume with paginate")
+    @Operation(
+            summary = "Lấy danh sách hồ sơ",
+            description = "Trả về danh sách hồ sơ có hỗ trợ phân trang và lọc nâng cao theo email, trạng thái, kỹ năng, kinh nghiệm, chứng chỉ..."
+    )
     public ResponseEntity<ResultPaginationDTO> fetchAll(
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String url,
@@ -127,6 +153,10 @@ public class ResumeController {
 
     @PostMapping("/resumes/by-user")
     @Message("Get list resumes by user")
+    @Operation(
+            summary = "Lấy danh sách hồ sơ theo người dùng",
+            description = "Trả về danh sách hồ sơ thuộc về người dùng đang đăng nhập, có hỗ trợ phân trang."
+    )
     public ResponseEntity<ResultPaginationDTO> fetchResumeByUser(Pageable pageable) {
         return ResponseEntity.ok().body(this.resumeService.fetchResumeByUser(pageable));
     }

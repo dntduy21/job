@@ -2,13 +2,12 @@ package com.dinhngoctranduy.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
@@ -23,40 +22,17 @@ public class OpenAPIConfig {
                 .scheme("bearer");
     }
 
-    private Server createServer(String url, String description) {
-        Server server = new Server();
-        server.setUrl(url);
-        server.setDescription(description);
-        return server;
-    }
-
-    private Contact createContact() {
-        return new Contact()
-                .email("dntduy.21@gmail.com")
-                .name("Đinh Ngọc Trần Duy");
-    }
-
-    private License createLicense() {
-        return new License()
-                .name("MIT License")
-                .url("https://choosealicense.com/licenses/mit/");
-    }
-
-    private Info createApiInfo() {
-        return new Info()
-                .title("Hire API")
-                .version("1.0")
-                .contact(createContact())
-                .description("Website tuyển dụng")
-                .license(createLicense());
-    }
-
     @Bean
-    public OpenAPI myOpenAPI() {
+    public OpenAPI myOpenAPI(@Value("${open.api.title}") String title,
+                             @Value("${open.api.version}") String version,
+                             @Value("${open.api.description}") String description,
+                             @Value("${open.api.serverUrl}") String serverUrl,
+                             @Value("${open.api.serverName}") String serverName) {
         return new OpenAPI()
-                .info(createApiInfo())
-                .servers(List.of(
-                        createServer("http://localhost:8080", "Server URL in Development environment")))
+                .info(new Info().title(title)
+                        .version(version)
+                        .description(description))
+                .servers(List.of(new Server().url(serverUrl).description(serverName)))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()));
     }
