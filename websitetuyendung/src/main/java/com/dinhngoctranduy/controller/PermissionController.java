@@ -93,11 +93,11 @@ public class PermissionController {
     @Message("Fetch permissions")
     public ResponseEntity<ResultPaginationDTO> getPermissions(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String method,
             @RequestParam(required = false) String module,
             Pageable pageable
     ) {
-        Specification<Permission> spec = PermissionSpecification.withFilters(name, description, module);
+        Specification<Permission> spec = PermissionSpecification.withFilters(name, method, module);
         return ResponseEntity.ok(permissionService.getPermissions(spec, pageable));
     }
 }

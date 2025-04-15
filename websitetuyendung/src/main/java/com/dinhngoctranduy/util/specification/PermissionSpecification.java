@@ -10,7 +10,7 @@ import java.util.List;
 
 public class PermissionSpecification {
 
-    public static Specification<Permission> withFilters(String name, String description, String module) {
+    public static Specification<Permission> withFilters(String name, String method, String module) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -18,8 +18,8 @@ public class PermissionSpecification {
                 predicates.add(cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
             }
 
-            if (description != null && !description.isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("description")), "%" + description.toLowerCase() + "%"));
+            if (method != null && !method.isBlank()) {
+                predicates.add(cb.like(cb.lower(root.get("method")), "%" + method.toLowerCase() + "%"));
             }
 
             if (module != null && !module.isBlank()) {

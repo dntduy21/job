@@ -41,7 +41,7 @@ public class FileController {
 
     @Operation(
             summary = "Tải lên tệp",
-            description = "Tải lên một tệp đơn vào thư mục chỉ định. Chỉ chấp nhận định dạng: pdf."
+            description = "Tải lên một tệp đơn vào thư mục chỉ định. Chỉ chấp nhận định dạng: pdf, jpg, jpeg, png."
     )
     @PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Message("upload single file")
@@ -51,7 +51,7 @@ public class FileController {
             throw new StorageException(Translator.toLocale("file.empty"));
         }
         String fileName = file.getOriginalFilename();
-        List<String> allowedExtensions = Arrays.asList("pdf");
+        List<String> allowedExtensions = Arrays.asList("pdf", "jpg", "jpeg", "png");
         boolean isValid = allowedExtensions.stream().anyMatch(item -> fileName.toLowerCase().endsWith(item));
 
         if (!isValid) {
