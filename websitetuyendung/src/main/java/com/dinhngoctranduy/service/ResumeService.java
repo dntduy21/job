@@ -12,10 +12,12 @@ import com.dinhngoctranduy.repository.ResumeRepository;
 import com.dinhngoctranduy.repository.UserRepository;
 import com.dinhngoctranduy.util.SecurityUtil;
 import com.dinhngoctranduy.util.specification.ResumeSpecification;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -77,9 +79,16 @@ public class ResumeService {
         return res;
     }
 
+    @Transactional
     public void delete(long id) {
-        this.resumeRepository.deleteById(id);
+        Resume resume = resumeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Resume not found with id " + id));
+
+        // Xoá liên kết để Hibernate tự xoá ResumeDetails
+        resume.setResumeDetails(null);
+        resumeRepository.delete(resume);
     }
+
 
     public ResFetchResumeDTO getResume(Resume resume) {
         ResFetchResumeDTO res = new ResFetchResumeDTO();
