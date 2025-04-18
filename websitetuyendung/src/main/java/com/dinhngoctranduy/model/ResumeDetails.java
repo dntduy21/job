@@ -23,6 +23,7 @@ public class ResumeDetails {
     private String address;
     private int yearsOfExperience;
     private String certificates;
+    private Integer score;
 
     @OneToOne
     @JoinColumn(name = "resume_id", unique = true)

@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -89,6 +90,8 @@ public class CvAnalysisService {
             System.out.println("=== Gemini Response ===\n" + aiResponse);
 
             CvAnalysisResult extracted = parseAIResult(fileName, aiResponse);
+            int score = scoreCv(extracted);
+            System.out.println("CV Score: " + score);
 
             Resume resume = resumeRepository.findByUrl(fileName)
                     .orElseThrow(() -> new RuntimeException("Resume not found for file: " + fileName));
@@ -105,6 +108,7 @@ public class CvAnalysisService {
             details.setAddress(extracted.getAddress());
             details.setYearsOfExperience(extracted.getYearsOfExperience());
             details.setCertificates(extracted.getCertificates());
+            details.setScore(score);
 
             resume.setParsed(true);
             resume.setUpdatedAt(Instant.now());
@@ -117,6 +121,43 @@ public class CvAnalysisService {
             e.printStackTrace();
             throw new RuntimeException("Failed to analyze and save resume: " + fileName, e);
         }
+    }
+
+    // Chấm điểm CV trên thang 10
+    private int scoreCv(CvAnalysisResult result) {
+        int score = 0;
+
+        // Years of experience (0-10)
+        int years = Optional.ofNullable(result.getYearsOfExperience()).orElse(0);
+        if (years >= 5) score += 10;
+        else if (years >= 3) score += 7;
+        else if (years >= 1) score += 4;
+        else score += 2;
+
+        // Skills (0-10)
+        int skillCount = result.getSkills() != null ? result.getSkills().split(",").length : 0;
+        if (skillCount >= 10) score += 10;
+        else if (skillCount >= 6) score += 7;
+        else if (skillCount >= 3) score += 4;
+        else score += 2;
+
+        // Education (0-10)
+        String edu = Optional.ofNullable(result.getEducation()).orElse("").toLowerCase();
+        if (edu.contains("master") || edu.contains("thạc sĩ")) score += 10;
+        else if (edu.contains("bachelor") || edu.contains("đại học")) score += 8;
+        else if (edu.contains("cao đẳng") || edu.contains("college")) score += 5;
+        else score += 2;
+
+        // Certificates (0-10)
+        if (result.getCertificates() != null && !result.getCertificates().isEmpty()) {
+            int certCount = result.getCertificates().split(",").length;
+            score += Math.min(10, certCount * 2);
+        }
+
+        // ATS bonus (5 điểm nếu pass)
+        score += 5;
+
+        return Math.min(score / 5, 10); // Chuyển về thang điểm 10
     }
 
     private boolean isAtsCompliant(String text) {

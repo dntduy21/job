@@ -138,7 +138,9 @@ public class ResumeService {
                 null,      // address
                 null,      // minYearsOfExperience
                 null,      // maxYearsOfExperience
-                null       // certificate
+                null,      // certificate
+                null,
+                null
         );
 
         Page<Resume> pageResume = this.resumeRepository.findAll(spec, pageable);

@@ -139,13 +139,16 @@ public class ResumeController {
             @RequestParam(required = false) Integer minYearsOfExperience,
             @RequestParam(required = false) Integer maxYearsOfExperience,
             @RequestParam(required = false) String certificate,
+            @RequestParam(required = false) Integer minScore,
+            @RequestParam(required = false) Integer maxScore,
             Pageable pageable
     ) {
         Specification<Resume> spec = ResumeSpecification.withAllFilters(
                 email, url, status, isParsed, userId, jobId,
                 skills, education, address,
                 minYearsOfExperience, maxYearsOfExperience,
-                certificate
+                certificate,
+                minScore, maxScore
         );
         return ResponseEntity.ok(resumeService.fetchAllResume(spec, pageable));
     }

@@ -27,7 +27,9 @@ public class ResumeSpecification {
             String address,
             Integer minYearsOfExperience,
             Integer maxYearsOfExperience,
-            String certificate
+            String certificate,
+            Integer minScore,
+            Integer maxScore
     ) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -86,6 +88,14 @@ public class ResumeSpecification {
 
             if (certificate != null && !certificate.isEmpty()) {
                 orPredicates.add(cb.like(cb.lower(details.get("certificates")), "%" + certificate.toLowerCase() + "%"));
+            }
+
+            if (minScore != null && maxScore != null) {
+                orPredicates.add(cb.between(details.get("score"), minScore, maxScore));
+            } else if (minScore != null) {
+                orPredicates.add(cb.greaterThanOrEqualTo(details.get("score"), minScore));
+            } else if (maxScore != null) {
+                orPredicates.add(cb.lessThanOrEqualTo(details.get("score"), maxScore));
             }
 
             // Kết hợp: AND giữa các điều kiện ở Resume + OR các điều kiện từ ResumeDetails
