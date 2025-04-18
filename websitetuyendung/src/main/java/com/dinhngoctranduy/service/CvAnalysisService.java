@@ -143,9 +143,9 @@ public class CvAnalysisService {
 
         // Education (0-10)
         String edu = Optional.ofNullable(result.getEducation()).orElse("").toLowerCase();
-        if (edu.contains("master") || edu.contains("thạc sĩ")) score += 10;
-        else if (edu.contains("bachelor") || edu.contains("đại học")) score += 8;
-        else if (edu.contains("cao đẳng") || edu.contains("college")) score += 5;
+        if (edu.contains("master")) score += 10;
+        else if (edu.contains("bachelor")) score += 8;
+        else if (edu.contains("college")) score += 5;
         else score += 2;
 
         // Certificates (0-10)
